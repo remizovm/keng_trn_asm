@@ -2,8 +2,8 @@ format	    PE GUI 4.0
 entry	    start
 
 include     'win32a.inc'
-include     'trn_engine.inc'
-include     'sigscan.inc'
+include     'inc\trn_engine.inc'
+include     'inc\sigscan.inc'
 
 struct PROCESSENTRY32
        dwSize			dd ?
