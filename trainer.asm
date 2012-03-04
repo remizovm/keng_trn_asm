@@ -4,35 +4,10 @@ entry	    start
 include     'win32a.inc'
 include     'inc\trn_engine.inc'
 include     'inc\sigscan.inc'
+include     'inc\structures.inc'
 
-struct PROCESSENTRY32
-       dwSize			dd ?
-       cntUsage 		dd ?
-       th32ProcessID		dd ?
-       th32DefaultHeapID	dd ?
-       th32ModuleID		dd ?
-       cntThreads		dd ?
-       th32ParentProcessID	dd ?
-       pcPriClassBase		dd ?
-       dwFlags			dd ?
-       szExeFile		db 260 dup(?)
-ends
-
-struct MODULEENTRY32
-	dwSize			dd ?   
-	th32ModuleID		dd ? 
-	th32ProcessID		dd ? 
-	GlblcntUsage		dd ? 
-	ProccntUsage		dd ? 
-	modBaseAddr		dd ?   
-	modBaseSize		dd ? 
-	hModule 		dd ?
-	szModule		rb 260 
-	szExePath		rb 1024
-ends
 
 section '.data' data readable writable
-	pid	     dd 0
 	hinst	     dd 0
 	hDC	     dd 0
 	memDC	     dd 0
@@ -46,7 +21,6 @@ section '.data' data readable writable
 	phandle      dd 0
 	trn_flag     dd 0
 	;scanner
-	AllocSize    dd 0
 	AllocAddress dd 0
 	EndofAlloc   dd 0
 	ScanPattern  dd _ScanPattern
@@ -70,9 +44,9 @@ hSnapshot		dd ?
 mSnapshot		dd ?
 PrcList 		db 'codsp.exe',0
 dllname_addr		dd 0x0005E16C
-buffer_handle		dd ?
-buffer_address		dd ?
-buffer_name		dd ?
+;buffer_handle           dd ?
+;buffer_address          dd ?
+;buffer_name             dd ?
 pID			dd ?
 ;-----------------------Change stuff here---------------------
 
