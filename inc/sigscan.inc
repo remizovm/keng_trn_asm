@@ -1,4 +1,10 @@
-proc _ScanPattern,ProcessHandle,pattern,pSize,mask,modname
+proc _ScanPattern,ProcessHandle,pattern,mask,modname
+locals
+	pSize		dd ?
+	allocAddress	dd ?
+	endOfAlloc	dd ?
+endl
+
      invoke	CreateToolhelp32Snapshot,8,[pID]
      mov	[mSnapshot],eax
      mov	[module.dwSize],sizeof.MODULEENTRY32
@@ -8,14 +14,17 @@ check_module:
      test	eax,eax
      jz 	next_module
 ;-------------------------------------------------------------------------------------------------------------
-push	   ecx esi edi
+     push	ecx esi edi
+     invoke	lstrlen,[pattern]
+     inc	eax
+     mov	[pSize],eax
      invoke	VirtualAlloc,0,[module.modBaseSize],MEM_COMMIT,PAGE_EXECUTE_READWRITE
-     mov	[AllocAddress],eax
+     mov	[allocAddress],eax
      add	eax,[module.modBaseSize]
      dec	eax
-     mov	[EndofAlloc],eax
-     invoke	ReadProcessMemory,[phandle],[module.modBaseAddr],[AllocAddress],[module.modBaseSize],0
-     mov	edi,[AllocAddress]
+     mov	[endOfAlloc],eax
+     invoke	ReadProcessMemory,[phandle],[module.modBaseAddr],[allocAddress],[module.modBaseSize],0
+     mov	edi,[allocAddress]
      mov	esi,[pattern]
 MainLoop:
      xor	ecx,ecx
@@ -35,21 +44,21 @@ Loop2:
      cmp	ecx,[pSize]
      jne	Search
      mov	eax,edi
-     sub	eax,[AllocAddress]
+     sub	eax,[allocAddress]
      add	eax,[module.modBaseAddr]
      push	eax
-     invoke	VirtualFree,[AllocAddress],[module.modBaseSize],MEM_DECOMMIT
+     invoke	VirtualFree,[allocAddress],[module.modBaseSize],MEM_DECOMMIT
      pop	eax
      ret
 Bdnm:
-     cmp	edi,[EndofAlloc]
+     cmp	edi,[endOfAlloc]
      jnb	OutOfScanRange
      inc	edi
      jmp	MainLoop
 OutOfScanRange:
      mov	eax,-1
      push	eax
-     invoke	VirtualFree,[AllocAddress],[module.modBaseSize],MEM_DECOMMIT
+     invoke	VirtualFree,[allocAddress],[module.modBaseSize],MEM_DECOMMIT
      pop	eax
      pop	ecx esi edi
      ret

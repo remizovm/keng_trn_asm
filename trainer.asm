@@ -21,8 +21,6 @@ section '.data' data readable writable
 	phandle      dd 0
 	trn_flag     dd 0
 	;scanner
-	AllocAddress dd 0
-	EndofAlloc   dd 0
 	ScanPattern  dd _ScanPattern
 	;scanner
 	Text1		db 'Coded by keng.',0
@@ -148,8 +146,8 @@ proc TrnThread
      invoke	GetAsyncKeyState,VK_F1
      cmp	eax,0
      je 	@F
-     ;call       ActivateTrn
-     call	GetProcess
+     call	ActivateTrn
+     ;call       GetProcess
      ;call       GetProcessModule
      @@:
      invoke	Sleep,100
