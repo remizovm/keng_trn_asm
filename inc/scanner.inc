@@ -1,5 +1,5 @@
 .code
-ScanPattern proc uses ecx esi edi pattern:dword,pattern_mask:dword,modulename:dword,pSize:dword,pid:dword
+ScanPattern proc uses ecx esi edi pattern:dword,pattern_mask:dword,modulename:dword,pSize:dword;,pid:dword
 
 LOCAL aSize:dword,aAddress:dword,EndofAlloc:dword,mSnapshot:dword,module:MODULEENTRY32,sAddress:dword,eAddress:dword,pHandle:dword
 
