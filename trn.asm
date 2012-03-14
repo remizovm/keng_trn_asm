@@ -12,8 +12,8 @@ include inc\ufmod.inc
 include inc\scanner.inc
 include inc\image.inc
 include \masm32\include\msimg32.inc
-includelib \masm32\lib\msimg32.lib
 
+includelib \masm32\lib\msimg32.lib
 includelib gdi32.lib
 includelib kernel32.lib
 includelib user32.lib
@@ -23,20 +23,6 @@ includelib lib\ufmod.lib
 includelib winmm.lib
 includelib lib\image.lib
 
-GETV MACRO dVar
-	mov eax,dVar 
-  EXITM <eax>
-ENDM
-
-RGB macro red,green,blue
-           xor eax,eax
-
-           mov ah,blue
-           shl eax,8
-           mov ah,green
-           mov al,red
-
-   endm
 
 OPTIONSTRUCT struct
 	pattern 		dd 0 
@@ -53,24 +39,22 @@ OPTIONSTRUCT struct
 	pSize			dd 0
 OPTIONSTRUCT ends
 
-DlgProc PROTO :HWND,:UINT,:WPARAM,:LPARAM
-InitCaveProc PROTO :DWORD,:DWORD
-WriteCave PROTO :DWORD,:DWORD,:DWORD
-WriteBuffer PROTO :DWORD,:DWORD,:DWORD,:DWORD
-GetMemoryForCave PROTO :DWORD
-InitOption PROTO :OPTIONSTRUCT
-TrnThread PROTO
-PaintText PROTO :DWORD,:DWORD,:DWORD,:DWORD
-DrawStars		PROTO :RECT
-NewStar         PROTO :DWORD,:DWORD,:DWORD,:DWORD,:DWORD
-Random          PROTO :DWORD
+DlgProc 			PROTO :HWND,:UINT,:WPARAM,:LPARAM
+InitCaveProc 		PROTO :DWORD,:DWORD
+WriteCave 			PROTO :DWORD,:DWORD,:DWORD
+WriteBuffer 		PROTO :DWORD,:DWORD,:DWORD,:DWORD
+GetMemoryForCave	PROTO :DWORD
+InitOption 			PROTO :OPTIONSTRUCT
+TrnThread 			PROTO
+PaintText 			PROTO :DWORD,:DWORD,:DWORD,:DWORD
+DrawStars			PROTO :RECT
+NewStar         	PROTO :DWORD,:DWORD,:DWORD,:DWORD,:DWORD
+Random          	PROTO :DWORD
 
 .const
-TEXTFONT		equ "Acknowledge -BRK-"
-IDT_STARS		equ 101
-IDT_TEXT		equ 102
-NumberOfStars equ 1000
-StarStructureSize equ 28
+IDT_STARS			equ 101
+NumberOfStars 		equ 1000
+StarStructureSize	equ 28
 
 .data
 ;######################################################
@@ -184,13 +168,6 @@ option4 OPTIONSTRUCT <offset option4_pattern,\
 					   7,\
 					   11>
 ;######################################################
-
-myline POINT {10,10}
-	   POINT {20,20}
-	   POINT {30,30}
-	   POINT {40,40}
-
-;######################################################
   
 EasternStar 	db FALSE ;Eastern Star Nv
 Speed 			dd 10 ;speed
@@ -210,13 +187,12 @@ info_flag		db ?
 game_flag		db ?
 music_flag		db ?
 music_paused	db ?
-
 ;-----------
 hFontWindow		HFONT	?
 hBgColor    	HBRUSH	?
 hmainDC         HDC		?
 hLayerDC1		HDC		?
-starsDC		HDC		?
+starsDC			HDC		?
 textDC			HDC		?
 hBmpMain		HBITMAP ?
 hBmpLayer1		HBITMAP ?
@@ -227,6 +203,7 @@ pStars 			dd ? ;P Stars
 RandomNamePr 	dd ?
 myRect			RECT	<?>
 
+
 .code
 
 start:
@@ -235,6 +212,7 @@ start:
     invoke 	InitCommonControls
 	invoke 	DialogBoxParam,hInstance,101,NULL,addr DlgProc,NULL
 	invoke 	ExitProcess,0
+	
 DlgProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 LOCAL hDC:HANDLE
 LOCAL rect:RECT
@@ -312,8 +290,7 @@ LOCAL ps:PAINTSTRUCT
 		mov edi,ps.rcPaint.bottom
 		sub esi,ps.rcPaint.left
 		sub edi,ps.rcPaint.top
-		invoke  BitBlt,hmainDC,0,0,240,160,bkgDC,0,0,SRCCOPY
-		invoke  Polyline,hmainDC,addr myline,2
+		invoke  BitBlt,hmainDC,0,0,240,160,bkgDC,0,0,SRCCOPY		
 		invoke  BitBlt,hmainDC,10,10,220,120,starsDC,0,0,SRCCOPY
 		invoke 	TransparentBlt,hmainDC,ps.rcPaint.left,ps.rcPaint.top,esi,edi,textDC,ps.rcPaint.left,ps.rcPaint.top,esi,edi,0		
 		invoke	BitBlt,hDC,0,0,240,160,hmainDC,0,0,SRCCOPY
@@ -325,8 +302,7 @@ LOCAL ps:PAINTSTRUCT
 			invoke 	GetStockObject,BLACK_BRUSH
 			invoke 	FillRect,starsDC,ADDR myRect,eax
 			invoke 	DrawStars,myRect
-			invoke 	InvalidateRect,hWnd,NULL,FALSE	
-			;invoke  BitBlt,textDC,0,0,240,160,textDC,0,0,PATCOPY
+			invoke 	InvalidateRect,hWnd,NULL,FALSE			
 		.endif
          mov eax,1
          ret
@@ -465,14 +441,14 @@ InitOption proc structure:OPTIONSTRUCT
 	invoke 	ScanPattern,structure.pattern,structure.pattern_mask,structure.module,structure.pSize,pid	
 	.if eax!=-1
 		mov 	ebx,[structure.aT]
-	mov 	[ebx],eax
-	mov		structure.aT,eax	
-	invoke 	GetMemoryForCave,structure.bSize
-	mov 	ebx,[structure.aF]
-	mov 	[ebx],eax
-	mov		structure.aF,eax			
-	invoke	WriteCave,structure.aF,structure.cave_bytecode,structure.bSize	
-	invoke 	WriteBuffer,structure.aF,structure.aT,structure.buffer,structure.oSize
+		mov 	[ebx],eax
+		mov		structure.aT,eax	
+		invoke 	GetMemoryForCave,structure.bSize
+		mov 	ebx,[structure.aF]
+		mov 	[ebx],eax
+		mov		structure.aF,eax			
+		invoke	WriteCave,structure.aF,structure.cave_bytecode,structure.bSize	
+		invoke 	WriteBuffer,structure.aF,structure.aT,structure.buffer,structure.oSize
 	.else
 		invoke Beep,200,500
 	.endif		
@@ -618,145 +594,128 @@ LOCAL Ywindow:DWORD
 LOCAL Xwindowdiv2:DWORD
 LOCAL Ywindowdiv2:DWORD
 	
-	
-	
-	push rect.right
-	pop Xwindow
-	
-	push rect.bottom
-	pop Ywindow
-	;m2m Xwindow,rect.right
-	;m2m Ywindow,rect.bottom
-	
-	mov eax,Xwindow
-	shr eax, 1 ; This gets the center point of screen to start starfield
-	mov Xwindowdiv2, eax
-  	mov eax,Ywindow
-  	shr eax, 1 ; This gets the center point of screen to start starfield
-	mov Ywindowdiv2, eax  
-
-    xor ecx, ecx
-    .WHILE ecx != NumberOfStars ;NbEtoile=No. Stars
-      mov eax, StarStructureSize ;StarStructureSize=Size Struct Star
-      mul ecx
-      add eax, pStars
-      mov ebx, eax
-      ;----------------------------------------------;
-      ;--- CHECK IF THE STAR IS ALWAYS GOOD ---;
-      mov eax, Speed
-      .IF dword ptr [ebx + 8] <= eax
-        push ecx
-        invoke NewStar,ebx,rect.right,rect.bottom,Xwindowdiv2,Ywindowdiv2 ;NewStar=New Star
-        pop ecx
-        mov EasternStar, TRUE
-      .ENDIF
-      ;----------------------------------------------;
-      ;--- REPLACEMENT OF OLD ADDRESS ---;
-      .IF DisplaysTrolling ; DisplaysTrolling=Displays Trolling or Drive type displayed???
-        push dword ptr [ebx + 12]
-        pop dword ptr [ebx + 20]
-        push dword ptr [ebx + 16]
-        pop dword ptr [ebx + 24]
-      .ENDIF
-      ;----------------------------------------;
-      ;--- CALCULATION OF NEW ADDRESS ---;
-      mov eax, Speed     ; Speed = Speed
-      sub dword ptr [ebx + 8], eax
-      mov eax, dword ptr [ebx]
-      shl eax, 8
-      cdq
-      idiv dword ptr [ebx + 8]
-      add eax, Xwindowdiv2
-      mov dword ptr [ebx + 12], eax
-      mov eax, dword ptr [ebx + 4]
-      shl eax, 8
-      cdq
-      idiv dword ptr [ebx + 8]
-      add eax, Ywindowdiv2
-      mov dword ptr [ebx + 16], eax
-      ;---------------------------;
-      ;--- CORRECTION OF BUGS ---;
-      .IF DisplaysTrolling && EasternStar ;Eastern Star Nv
-        push dword ptr [ebx + 12]
-        pop dword ptr [ebx + 20]
-        push dword ptr [ebx + 16]
-        pop dword ptr [ebx + 24]
-        mov EasternStar, FALSE
-      .ENDIF
-      ;--------------------------------------------------------------------;
-      ;--- CHECK IF THE STAR IS ALWAYS IN THE LIMITS OF THE SCREEN ---;
-      mov eax, Xwindow
-      mov edx, Ywindow    ;fenetre=window
-      .IF dword ptr [ebx + 12] < 0 || dword ptr [ebx + 12] > eax || dword ptr [ebx + 16] < 0 || dword ptr [ebx + 16] > edx
-        mov dword ptr [ebx + 8], 0
-      .ENDIF
-      push ecx
-      ;---------------------------;
-      ;--- COLOR OF THE STAR ---;
-      xor eax, eax
-      mov ah, cl
-      mov al, ah
-      shl eax, 8
-      mov al, ah
-      invoke CreatePen, PS_SOLID, NULL, eax
-      push eax
-      invoke SelectObject, starsDC, eax
-      ;--------------------------;
-      ;--- DRAWING FROM THE STAR ---;
-      push NULL
-      .IF DisplaysTrolling
-        push dword ptr [ebx + 24]
-        push dword ptr [ebx + 20]
-      .ELSE
-        mov eax, dword ptr [ebx + 16]
-        inc eax
-        push eax
-        push dword ptr [ebx + 12]
-      .ENDIF
-      push starsDC
-      call MoveToEx
-      invoke LineTo, starsDC, dword ptr [ebx + 12], dword ptr [ebx + 16]
-      pop eax
-      invoke SelectObject,starsDC,eax
-      invoke DeleteObject,eax
-      pop ecx
-      inc ecx
+	push 	rect.right
+	pop 	Xwindow	
+	push	rect.bottom
+	pop 	Ywindow	
+	mov 	eax,Xwindow
+	shr 	eax,1
+	mov 	Xwindowdiv2,eax
+  	mov 	eax,Ywindow
+  	shr 	eax,1
+	mov 	Ywindowdiv2,eax
+    xor 	ecx,ecx
+    .WHILE ecx!=NumberOfStars
+    	mov 	eax,StarStructureSize
+    	mul 	ecx
+      	add 	eax,pStars
+      	mov 	ebx,eax      
+      	mov 	eax,Speed
+      	.if dword ptr [ebx+8]<=eax
+        	push 	ecx
+        	invoke	NewStar,ebx,rect.right,rect.bottom,Xwindowdiv2,Ywindowdiv2
+        	pop 	ecx
+        	mov 	EasternStar,TRUE
+      	.endif      
+      	.if DisplaysTrolling
+        	push 	dword ptr [ebx+12]
+        	pop 	dword ptr [ebx+20]
+        	push 	dword ptr [ebx+16]
+        	pop 	dword ptr [ebx+24]
+      	.endif
+      	mov 	eax,Speed
+      	sub 	dword ptr [ebx+8],eax
+      	mov 	eax,dword ptr [ebx]
+      	shl 	eax,8
+      	cdq
+      	idiv 	dword ptr [ebx+8]
+      	add 	eax,Xwindowdiv2
+      	mov 	dword ptr [ebx+12],eax
+      	mov 	eax,dword ptr [ebx+4]
+      	shl 	eax,8
+      	cdq
+      	idiv 	dword ptr [ebx+8]
+      	add 	eax,Ywindowdiv2
+      	mov 	dword ptr [ebx+16],eax
+      	.if DisplaysTrolling && EasternStar
+        	push	dword ptr [ebx+12]
+        	pop 	dword ptr [ebx+20]
+        	push 	dword ptr [ebx+16]
+        	pop 	dword ptr [ebx+24]
+        	mov 	EasternStar,FALSE
+      	.endif
+      	mov		eax,Xwindow
+      	mov 	edx,Ywindow
+      	.if dword ptr [ebx+12]<0 || dword ptr [ebx+12]>eax || dword ptr [ebx+16]<0 || dword ptr [ebx+16]>edx
+        	mov dword ptr [ebx+8],0
+      	.endif
+      	push 	ecx
+      	xor 	eax,eax
+      	mov 	ah,cl
+      	mov 	al,ah
+      	shl 	eax,8
+      	mov 	al,ah
+      	invoke	CreatePen,PS_SOLID,NULL,eax
+      	push 	eax
+      	invoke 	SelectObject,starsDC,eax
+      	push 	NULL
+      	.if DisplaysTrolling
+        	push	dword ptr [ebx+24]
+        	push 	dword ptr [ebx+20]
+      	.else
+        	mov 	eax,dword ptr [ebx+16]
+        	inc 	eax
+        	push 	eax
+        	push 	dword ptr [ebx+12]
+      	.endif
+      	push 	starsDC
+      	call 	MoveToEx
+      	invoke	LineTo,starsDC,dword ptr [ebx+12],dword ptr [ebx+16]
+      	pop 	eax
+      	invoke 	SelectObject,starsDC,eax
+      	invoke 	DeleteObject,eax
+      	pop 	ecx
+      	inc 	ecx
     .ENDW
-
 	ret
 	
 DrawStars endp
 
 NewStar PROC uses ebx pStar:DWORD,nx:DWORD,ny:DWORD,Xwindowdiv2:DWORD,Ywindowdiv2:DWORD
-	mov ebx, pStar
-	invoke Random, nx
-	sub eax, Xwindowdiv2
-	mov dword ptr [ebx], eax
-	invoke Random, nx
-	sub eax, Ywindowdiv2
-	mov dword ptr [ebx + 4], eax
-	mov dword ptr [ebx + 8], 256
-	push Xwindowdiv2
-	pop dword ptr [ebx + 12]
-	push Ywindowdiv2
-	pop dword ptr [ebx + 16]
-	mov eax, pStar
+
+	mov 	ebx,pStar
+	invoke 	Random,nx
+	sub 	eax,Xwindowdiv2
+	mov 	dword ptr [ebx],eax
+	invoke	Random,nx
+	sub 	eax,Ywindowdiv2
+	mov 	dword ptr [ebx+4],eax
+	mov 	dword ptr [ebx+8],256
+	push 	Xwindowdiv2
+	pop 	dword ptr [ebx+12]
+	push 	Ywindowdiv2
+	pop 	dword ptr [ebx+16]
+	mov 	eax,pStar
 	ret
+	
 NewStar ENDP 
 
 Random PROC Limit:DWORD
-	mov eax, RandomNamePr
-	mov ecx, 23
+
+	mov	eax,RandomNamePr
+	mov ecx,23
 	mul ecx
-	add eax, 7
-	and eax, 0FFFFFFFFh
-	ror eax, 1
-	xor eax, RandomNamePr
-	mov RandomNamePr, eax
-	mov ecx, Limit 
-	xor edx, edx
+	add eax,7
+	and eax,0FFFFFFFFh
+	ror eax,1
+	xor eax,RandomNamePr
+	mov RandomNamePr,eax
+	mov ecx,Limit 
+	xor edx,edx
 	div ecx
-	mov eax, edx
+	mov eax,edx
 	ret
+	
 Random ENDP
+
 end start
