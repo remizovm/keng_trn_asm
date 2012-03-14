@@ -1,0 +1,5 @@
+#define bkg								2
+123						RCDATA    DISCARDABLE "res/music.xm"
+bkg						IMAGE     DISCARDABLE "Res/bkg.jpg"
+500						ICON      DISCARDABLE "Res/1.ico"
+1000					CURSOR    DISCARDABLE "Res/arrow_r.cur"
