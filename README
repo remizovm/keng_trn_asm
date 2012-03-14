@@ -1,0 +1,49 @@
+Type: Trainer engine
+Language: MASM32
+Author: Remizov Mikhail aka keng
+
+1. What is it?
+
+A trainer is a small program designed to change another program's memory to gain any new functionality to the program.
+In most cases it is used in videogames to be able to cheat and to beat the game easily than it is standarted by the
+game's authors.
+
+The overall technique is called "gamehacking", which means that hack's author will need to find out what exactly 
+memory locations should he change - memory addresses, code locations etc., then compile the trainer using this
+source code and get all these functions in a small program, which don't need any more instruments, such as
+memory finders, debuggers, disassemblers etc.
+
+2. How to compile the source?
+
+Before the actual compilation I assume that you are familiar with gamehacking and able to hack the game - actually,
+get the needed addresses, offsets and bytecode.
+
+Then you should edit the data-section in the main source file (trn.asm) - fill in needed structures for every option
+you made.
+
+I prefer RadASM as an IDE for coding, so I've included the project file - you have two choices:
+
+-Download and install RadASM and MASM32, open the project file, hit "Make" - "Go".
+
+If you do not want to use RadASM or any other IDE, you can compile it with MASM32 compiler and linker,
+I will not write any steps of it because there is not anything special in the sources and if you do not know how to
+compile the source code then this is not for you and you should learn some basics in programming.
+
+3. Is it safe?
+
+Be sure that sources do not contain any harmful code, but some firewalls and antivirus software could mark the
+compiled trainer as suspicious because of it's main functionality - it uses WinAPI functions to access another
+processes and modify it's memory, so it is very similar to virus-like behaviour.
+
+4. Is it legal?
+
+It is while you are using licensed game copies and do not make any commercial, so be aware from selling your trainers
+either this source code - otherwords, it's completely free for non-commercial usage.
+
+5. Actual Functionality:
+
+-Basic memory writing (code-injection).
+-Dynamic caving (the cave code writes in an allocated chunk of memory of game's process).
+-Signature scanning (this module allows to use wildcards to obtain the needed code locations for injection).
+-Process finding by it's original name - if the name of the executable got changed this function will still allow
+to locate it because of original name, stored inside the PE-file (read more about PE-format at MSDN).
